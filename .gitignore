@@ -1,0 +1,5 @@
+.env
+accounts.json
+./Valorant-DiscordBot
+./*.sqlite
+./__pycache__
