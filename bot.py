@@ -27,13 +27,14 @@ async def on_ready():
     await bot.tree.sync()
     print(f'Logged in as {bot.user}')
 
-ranks = ['Unranked','Iron_1','Iron_2','Iron_3','Bronze_1','Bronze_2','Bronze_3',
+ranks = ['Unranked','Unrated','Iron_1','Iron_2','Iron_3','Bronze_1','Bronze_2','Bronze_3',
          'Silver_1','Silver_2','Silver_3','Gold_1','Gold_2','Gold_3',
          'Platinum_1','Platinum_2','Platinum_3','Diamond_1','Diamond_2',
          'Diamond_3','Ascendant_1','Ascendant_2','Ascendant_3','Immortal_1',
          'Immortal_2','Immortal_3','Radiant']
 
 ranks_url = ['https://i122.fastpic.org/big/2023/1201/92/4ed842285cfa4519fa39b1b77c66d192.png',
+             'https://i122.fastpic.org/big/2023/1201/92/4ed842285cfa4519fa39b1b77c66d192.png',
              'https://i122.fastpic.org/big/2023/1130/e5/0cf5e14744db48be25d4ae6365a954e5.png',
              'https://i122.fastpic.org/big/2023/1130/9a/31b8deddcd1466170d4d86a934b6b99a.png',
              'https://i122.fastpic.org/big/2023/1130/a1/e2b0045f62349132642f3f4d0199f7a1.png',
