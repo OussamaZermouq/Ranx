@@ -2,7 +2,7 @@ from requests_cache import CachedSession
 from dotenv import load_dotenv
 import os
 from datetime import timedelta
-
+import requests
 load_dotenv()
 token = os.getenv('API_KEY')
 
@@ -64,8 +64,19 @@ def fetch_last_MMR_registered(puuid:str):
         return output 
 
 
-print(fetch_last_MMR_registered(get_puuid('Memphré','0001')))
-
+def fetch_last_MMR_registered_v3(username:str, tag:str):
+    url = f'https://api.henrikdev.xyz/valorant/v3/mmr/eu/pc/{username}/{tag}'
+    headers = {
+        "Accept": "application/json",
+        "Authorization":f'{token}'
+    }
+    response = requests.get(url=url, headers=headers)
+    data = response.json()
+    if data['status']:
+        if data['status'] == 200:
+            return data
+    else:
+        return None
 
 # def return_last_filled_rank(puuid:str):
 #     for season in reversed(seasons):
@@ -86,14 +97,10 @@ def get_rr(puuid:str):
         "Accept": "application/json",
         "Authorization":f'{token}'
     }
-    urls_expire_after = {
-        url: -1,
-    }
     session = CachedSession('session_rr', expire_after=timedelta(days=1), cache_control='no-cache')
 
     response = session.get(url, headers=headers)
     if response.json()['status'] == 200:
-        print(response.json()['data']['ranking_in_tier'])
         return response.json()['data']['ranking_in_tier']
     elif response.json()['status'] == 429:
         return -2
@@ -101,3 +108,4 @@ def get_rr(puuid:str):
 
 def get_level(username:str,tag:str):
     return fetch_user(username,tag)['data']['account_level']
+

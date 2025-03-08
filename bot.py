@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 from discord.ext import commands
 from discord import app_commands
 from get_account_json import load_json, write_to_json, check_user_exist
-from fetch_api import fetch_last_MMR_registered, get_puuid, fetch_user, get_rr, get_level
+from fetch_api import fetch_last_MMR_registered, get_puuid, fetch_user, get_rr, get_level, fetch_last_MMR_registered_v3
 from fetch_api_skins import fetch_skin_item, fetch_user_daily_skins
 import py_hot_reload
 
@@ -67,7 +67,6 @@ rank_dict = dict(zip(ranks,ranks_url))
 @bot.tree.command(name="rank",description="Check a player's rank using the username and the tag.")
 async def slash_command(interaction:discord.Interaction, username:str, tag:str):
     account_data = fetch_user(username, tag)
-    print(account_data)
     if account_data is None:
         embed_account_error = discord.Embed(description=f"Either the information you have entered are incorrect or there is an issue with the API. Try again later.",color=0xfc1808)
         await interaction.response.send_message(embed=embed_account_error, ephemeral=True)
@@ -113,18 +112,9 @@ async def slash_command(interaction:discord.Interaction):
             tag = accounts[i]['tag']
             login = accounts[i]['login']
             password = accounts[i]['password']
-
             
-            player_rank_data = fetch_last_MMR_registered(get_puuid(username, tag))
-            print(username)
-            print(player_rank_data)
+            player_rank_data = fetch_last_MMR_registered_v3(username, tag)
             player_level = get_level(username, tag)
-            
-            if player_rank_data.get('old') =='true':
-                player_rank ='Unranked'
-            else:
-                player_rank = player_rank_data.get('rank')
-            
             account_rr = get_rr(get_puuid(username=username,tag=tag))
             
             embed_account = discord.Embed(description=f"{username}'s account information : ",
@@ -136,9 +126,14 @@ async def slash_command(interaction:discord.Interaction):
                                 inline=True)
                                 
             embed_account.add_field(name='Rank',
-                                value=f"{player_rank} | { 'Last ACT '+player_rank_data.get('act') if player_rank == 'Unranked' else player_rank_data.get('act')} | ({account_rr}/100)",
+                                value=f"{player_rank_data['data']['current']['tier']['name']} | RR ({player_rank_data['data']['current']['rr']}/100)",
                                 inline=False)
-            
+            embed_account.add_field(name='ELO',
+                                value=f"{player_rank_data['data']['current']['elo']}",
+                                inline=True)
+            embed_account.add_field(name='Peak rank',
+                                value=f"{player_rank_data['data']['peak']['tier']['name'] } | Season : {player_rank_data['data']['peak']['season']['short'] } ",
+                                inline=False)
             embed_account.add_field(name='Login',
                                 value=login,
                                 inline=True)
@@ -147,7 +142,7 @@ async def slash_command(interaction:discord.Interaction):
                                 value=password,
                                 inline=True)
                                 
-            embed_account.set_thumbnail(url=f"{rank_dict[player_rank.replace(' ','_')]}")
+            embed_account.set_thumbnail(url=f"{rank_dict[player_rank_data['data']['current']['tier']['name'].replace(' ','_')]}")
             embed_account.set_footer(text=f"Request made by @{interaction.user.name}", icon_url=f"{interaction.user.avatar.url}")
             await interaction.followup.send(embed=embed_account, ephemeral=True)
             
